@@ -62,6 +62,18 @@ mhm <- add_column( mhm,
                     unhealthy =    dat$Physical.Health.Issues ,
                     brainfog =    dat$Confusion.or.Slowed.Thinking )
 
+
+
+mhm <- mhm %>%
+  subset(country == "United States",
+         country == "United Kingdom",
+         country == "France",
+         country == "Australia",
+         country == "Canada",
+         country == "Germany",
+         country == "New Zealand",
+         country == "Ireland")
+
 ###########
 mhm_m <- mhm %>%
   subset(sex == "Male"  )
@@ -154,7 +166,7 @@ net_m <- ggmModSelect(cormat_m, nrow(mhm_m),
 save(net_m, file = "net_m.RData")
 
 # # Plot results:
-qgraph(net_m$graph, layout = "spring", cut = 0, vsize = 3,
+qgraph_m <- qgraph(net_m$graph, layout = "spring", cut = 0, vsize = 3,
        labels = names1,
        nodeNames = nameslong,
        label.cex = 1,
@@ -180,7 +192,7 @@ net_f <- ggmModSelect(cormat_f, nrow(mhm_f),
 save(net_f, file = "net_f.RData")
 
 
-qgraph(net_f$graph, layout = "spring", cut = 0, vsize = 3,
+qgraph_f<- qgraph(net_f$graph, layout = "spring", cut = 0, vsize = 3,
        labels = names1,
        nodeNames = nameslong,
        label.cex = 1,
@@ -193,9 +205,11 @@ qgraph(net_f$graph, layout = "spring", cut = 0, vsize = 3,
 
 
 
-ef_m <- centralityPlot(net_m, include = "ExpectedInfluence")
+ef_m <- centralityPlot(qgraph_m, include = "ExpectedInfluence")
 
-ef_f <- centralityPlot(net_f, include = "ExpectedInfluence")
+ef_f <- centralityPlot(qgraph_f, include = "ExpectedInfluence")
+
+
 
 
 
