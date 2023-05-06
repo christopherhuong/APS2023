@@ -134,9 +134,253 @@ dat <- dat %>%
 # NAs = 22
 
 
-# DEPR DIAG ---------------------------------------------------------------
+# DEPR DIAGNOSIS ---------------------------------------------------------------
 
-dat <-
+dat <- dat %>%
+  mutate(depr_diag = case_when(depr_diag == 1 ~ 1,  #YES
+                               depr_diag == 2 ~ 0,  #NO
+                               depr_diag == 7 ~ NA_real_,
+                               depr_diag == 9 ~ NA_real_))
+
+# NAs = 63
+
+
+
+# DEPR MED ----------------------------------------------------------------
+
+dat <- dat %>%
+  mutate(depr_med = case_when(depr_med == 1 ~ 1,  #YES
+                              depr_med == 2 ~ 0,  #NO
+                              depr_med == 7 ~ NA_real_,
+                              depr_med == 8 ~ NA_real_,
+                              depr_med == 9 ~ NA_real_))
+
+
+
+# ANXIETY DISORDER DIAGNOSIS ----------------------------------------------------------------
+
+dat <- dat %>%
+  mutate(anx_diag = case_when(anx_diag == 1 ~ 1,  #YES
+                              anx_diag == 2 ~ 0,  #NO
+                              anx_diag == 7 ~ NA_real_,
+                              anx_diag == 9 ~ NA_real_))
+
+
+# NAs = 62
+
+
+# ANXIETY MED -------------------------------------------------------------
+
+dat <- dat %>%
+  mutate(anx_med = case_when(anx_med == 1 ~ 1,  #YES
+                             anx_med == 2 ~ 0,  #NO
+                             anx_med == 7 ~ NA_real_,
+                             anx_med == 8 ~ NA_real_,
+                             anx_med == 9 ~ NA_real_))
+
+
+
+# PHQ 8 -------------------------------------------------------------------
+
+
+phqfun <- function(df, PHQ){
+  df <- df %>%
+    mutate(!!sym(PHQ) := case_when(!!sym(PHQ) == 1 ~ 0, #not at all
+                                  !!sym(PHQ) == 2 ~ 1, #several days
+                                  !!sym(PHQ) == 3 ~ 2, #more than half days
+                                  !!sym(PHQ) == 4 ~ 3, # nearly every day
+                                  !!sym(PHQ) == 7 ~ NA_real_,
+                                  !!sym(PHQ) == 8 ~ NA_real_,
+                                  !!sym(PHQ) == 9 ~ NA_real_))
+  return(df)
+}
+
+
+#PHQ1- How often little interest in things, past 2 weeks
+dat <- phqfun(dat, 'phq1')
+
+#PHQ2- How often feeling down, past 2 weeks
+dat <- phqfun(dat, 'phq2')
+
+#PHQ3- How often trouble with sleeping, past 2 weeks
+dat <- phqfun(dat, 'phq3')
+
+#PHQ4- How often feeling tired, past 2 weeks 
+dat <- phqfun(dat, 'phq4')
+
+#PHQ5- How often undereating or overeating, past 2 weeks
+dat <- phqfun(dat, 'phq5')
+
+#PHQ6- How often feeling bad about self, past 2 weeks
+dat <- phqfun(dat, 'phq6')
+
+#PHQ7- How often trouble concentrating, past 2 weeks
+dat <- phqfun(dat, 'phq7')
+
+#PHQ8- How often moving or speaking slow or fast, past 2 weeks
+dat <- phqfun(dat, 'phq8')
+
+
+# PHQ SUM SCORE
+
+dat$phq_sum <- dat$phq1 + dat$phq2 + dat$phq3 + dat$phq4 +
+  dat$phq5 + dat$phq6 + dat$phq7 + dat$phq8
+
+
+# GAD 7 -------------------------------------------------------------------
+
+
+
+gadfun <- function(df, GAD){
+  df <- df %>%
+    mutate(!!sym(GAD) := case_when(!!sym(GAD) == 1 ~ 0, #not at all
+                                   !!sym(GAD) == 2 ~ 1, #several days
+                                   !!sym(GAD) == 3 ~ 2, #more than half days
+                                   !!sym(GAD) == 4 ~ 3, # nearly every day
+                                   !!sym(GAD) == 7 ~ NA_real_,
+                                   !!sym(GAD) == 8 ~ NA_real_,
+                                   !!sym(GAD) == 9 ~ NA_real_))
+  return(df)
+}
+
+
+# GAD1- How often felt nervous/anxious/on edge, past 2 weeks
+dat <- gadfun(dat, 'gad1')
+
+# GAD2- How often can't stop/control worrying, past 2 weeks
+dat <- gadfun(dat, 'gad2')
+
+# GAD3- How often worrying too much, past 2 weeks
+dat <- gadfun(dat, 'gad3')
+
+# GAD4- How often had trouble relaxing, past 2 weeks
+dat <- gadfun(dat, 'gad4')
+
+# GAD5- How often can't sit still, past 2 weeks
+dat <- gadfun(dat, 'gad5')
+
+# GAD6- How often became easily annoyed, past 2 weeks 
+dat <- gadfun(dat, 'gad6')
+
+# GAD7- How often felt afraid, past 2 weeks 
+dat <- gadfun(dat, 'gad7')
+
+
+
+# GAD sum score
+dat$gad_sum <- dat$gad1 + dat$gad2 + dat$gad3 + dat$gad4 +
+  dat$gad5 + dat$gad6 + dat$gad7
+
+
+
+
+# split sample M F --------------------------------------------------------
+
+#save(dat, file = 'nhis19_clean.rdata')
+load('nhis19_clean.rdata')
+
+
+dat_m <- dat %>%
+  filter(sex == 1)
+
+dat_f <- dat %>%
+  filter(sex == 0)
+
+
+
+# select variables --------------------------------------------------------
+
+## just phq
+dat_m1 <- dat_m %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8)
+
+dat_f1 <- dat_f %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8)
+
+
+## phq + gad
+dat_m2 <- dat_m %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         gad1, gad2, gad3, gad4, gad5, gad6, gad7)
+
+dat_f2 <- dat_f %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         gad1, gad2, gad3, gad4, gad5, gad6, gad7)
+
+
+## phq + gad + covariates
+dat_m3 <- dat_m %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         sex, age, edu, race, bmi, pain_freq, genhlth, depr_med)
+
+dat_f3 <- dat_f %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         sex, age, edu, race, bmi, pain_freq, genhlth, depr_med)
+
+
+
+nameslong <- c("How often little interest in things",
+               "How often feeling down",
+               "How often trouble with sleeping",
+               "How often feeling tired",
+               "How often undereating or overeating",
+               "How often feeling bad about self",
+               "How often trouble concentrating",
+               "How often moving or speaking slow or fast")
+
+
+# estimate networks -------------------------------------------------------
+
+library(qgraph)       
+library(mgm)         
+library(bootnet)         
+library(networktools) 
+
+
+
+net_m1 <- estimateNetwork(dat_m1, default = "EBICglasso",
+                        missing = "pairwise",
+                        signed = T)
+
+
+
+#save(net1, file='net1.rdata')
+
+netplot_m1 <- plot(net_m1, layout = "spring", vsize = 5.5, 
+                 border.color="black",
+                 nodeNames = nameslong,
+                 legend.mode = "names",
+                 label.cex = 1.2,
+                 legend.cex = .85,
+                 layoutOffset = c(0,0),
+                 GLratio = 2.7,
+                 width = 17, height = 9,
+                 filetype = "pdf", filename = "netplot_m1",
+                 plot = T)
+
+
+
+
+
+
+net_f1 <- estimateNetwork(dat_f1, default = "EBICglasso",
+                          missing = "pairwise",
+                          signed = T)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
