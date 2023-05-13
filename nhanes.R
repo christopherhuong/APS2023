@@ -158,7 +158,7 @@ nameslong <- c("Have little interest in doing this",
                "Feeling bad about yourself",
                "Trouble concentrating on things",
                "Moving or speaking slowly or too fast",
-               "houghts you would be better off dead"
+               "Thoughts you would be better off dead"
 )
 
 
@@ -185,6 +185,7 @@ library(qgraph)
 library(mgm)         
 library(bootnet)         
 library(networktools) 
+library(NetworkComparisonTest)
 
 
 
@@ -216,39 +217,77 @@ gb
 
 
 
-net_m <- estimateNetwork(dat_m, default = "EBICglasso",
+net_m <- estimateNetwork(dat_m, default = "ggmModSelect",
+                        stepwise=T,
                         missing = "pairwise",
                         signed = T)
 
 
 
-netplot_m <- plot(net_m, layout = "spring", vsize = 5, 
+
+netplot_m <- plot(net_m, layout = "circle", vsize = 5, 
                  border.color="black",
-                 nodeNames = nameslong)
+                 nodeNames = nameslong,
+                 filetype = "pdf", filename = "netplot_m",
+                 plot = T)
 
 
+
+
+pdf('ei_m.pdf', width = 4, height = 5)
 ei_m <- centralityPlot(netplot_m, include = c("ExpectedInfluence"), scale = 'z-scores',
                       labels = nameslong)
-
-
+dev.off()
 
 
 # females -----------------------------------------------------------------
 
 
-net_f <- estimateNetwork(dat_f, default = "EBICglasso",
+
+net_f <- estimateNetwork(dat_f, default = "ggmModSelect",
+                         stepwise=T,
                          missing = "pairwise",
                          signed = T)
 
 
 
-netplot_f <- plot(net_f, layout = "spring", vsize = 5, 
+
+netplot_f <- plot(net_f, layout = "circle", vsize = 5, 
                   border.color="black",
-                  nodeNames = nameslong)
+                  nodeNames = nameslong,
+                  filetype = "pdf", filename = "netplot_f",
+                  plot = T)
 
 
+pdf('ei_f.pdf', width = 4.15, height = 5)
 ei_f <- centralityPlot(netplot_f, include = c("ExpectedInfluence"), scale = 'z-scores',
-                      labels = nameslong)
+                       labels = nameslong)
+dev.off()
+
+
+
+
+
+# bootstrap ---------------------------------------------------------------
+
+
+
+
+
+
+# NCT ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
