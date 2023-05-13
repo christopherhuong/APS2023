@@ -149,6 +149,21 @@ dat <- dat %>%
 
 # dropped 689
 
+
+nameslong <- c("Have little interest in doing this",
+               "Feeling down, depressed, or hopeless",
+               "Trouble sleeping or sleeping too much",
+               "Feeling tired or having little energy",
+               "Poor appetite or overeating",
+               "Feeling bad about yourself",
+               "Trouble concentrating on things",
+               "Moving or speaking slowly or too fast",
+               "houghts you would be better off dead"
+)
+
+
+
+
 # split sample ------------------------------------------------------------
 
 dat_m <- 
@@ -170,6 +185,90 @@ library(qgraph)
 library(mgm)         
 library(bootnet)         
 library(networktools) 
+
+
+
+# goldbricker for redundant nodes -----------------------------------------
+
+
+gb <- goldbricker(dat_m, p = 0.01, method = "hittner2003",
+                  threshold = 0.25, corMin = 0.5, progressbar = T)
+gb
+
+# Suggested reductions: Less than 25 % of correlations are significantly different for the following pairs: 
+#   PHQ5 & PHQ3 
+#  0.1428571 
+# fatigue & irregular appetite. these are different constructs tho?
+
+gb <- goldbricker(dat_f, p = 0.01, method = "hittner2003",
+                  threshold = 0.25, corMin = 0.5, progressbar = T)
+gb
+
+# Suggested reductions: Less than 25 % of correlations are significantly different for the following pairs: 
+#   [1] "No suggested reductions"
+
+
+
+
+# estimate networks -------------------------------------------------------
+
+# males -------------------------------------------------------------------
+
+
+
+net_m <- estimateNetwork(dat_m, default = "EBICglasso",
+                        missing = "pairwise",
+                        signed = T)
+
+
+
+netplot_m <- plot(net_m, layout = "spring", vsize = 5, 
+                 border.color="black",
+                 nodeNames = nameslong)
+
+
+ei_m <- centralityPlot(netplot_m, include = c("ExpectedInfluence"), scale = 'z-scores',
+                      labels = nameslong)
+
+
+
+
+# females -----------------------------------------------------------------
+
+
+net_f <- estimateNetwork(dat_f, default = "EBICglasso",
+                         missing = "pairwise",
+                         signed = T)
+
+
+
+netplot_f <- plot(net_f, layout = "spring", vsize = 5, 
+                  border.color="black",
+                  nodeNames = nameslong)
+
+
+ei_f <- centralityPlot(netplot_f, include = c("ExpectedInfluence"), scale = 'z-scores',
+                      labels = nameslong)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
