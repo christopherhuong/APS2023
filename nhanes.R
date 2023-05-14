@@ -173,11 +173,7 @@ dat_f <-
   select(filter(dat, SEX == 0), PHQ1, PHQ2, PHQ3, PHQ4, PHQ5, PHQ6, PHQ7, PHQ8, PHQ9)
 
 
-dat_mcovs <- 
-  select(filter(dat, SEX == 1), -SEX)
 
-dat_fcovs <-
-  select(filter(dat, SEX == 0), -SEX)
 
 
 # estimate networks -------------------------------------------------------
@@ -279,19 +275,129 @@ dev.off()
 
 
 
+nct1 <- NCT(net_m, net_f, it = 500, weighted = T,
+           test.edges = T, edges = "all",
+           test.centrality = T,
+           centrality = c("expectedInfluence"), nodes = "all",
+           
+           progressbar = T,
+           verbose = T)
+
+save(nct1, file = "nct1.RData")
+
+
+
+summary(nct1)
+
+
+
+
+
+# WITH COVARIATES ---------------------------------------------------------
+
+
+
+nameslongcovs <- c("Age", "Education", "Sedentary", "BMI",
+               "Have little interest in doing this",
+               "Feeling down, depressed, or hopeless",
+               "Trouble sleeping or sleeping too much",
+               "Feeling tired or having little energy",
+               "Poor appetite or overeating",
+               "Feeling bad about yourself",
+               "Trouble concentrating on things",
+               "Moving or speaking slowly or too fast",
+               "Thoughts you would be better off dead"
+)
+
+
+
+
+dat_mcovs <- 
+  select(filter(dat, SEX == 1), -SEX)
+
+dat_fcovs <-
+  select(filter(dat, SEX == 0), -SEX)
+
+
+
+# estimate male networks --------------------------------------------------
+
+
+
+
+net_mcovs <- estimateNetwork(dat_mcovs, default = "EBICglasso",
+                         missing = "pairwise",
+                         signed = T)
+
+
+
+
+netplot_mcovs <- plot(net_mcovs, layout = "circle", vsize = 5, 
+                  border.color="black",
+                  nodeNames = nameslongcovs,
+                  filetype = "pdf", filename = "netplot_mcovs",
+                  plot = T)
+
+
+
+
+pdf('ei_mcovs.pdf', width = 4, height = 5)
+ei_mcovs <- centralityPlot(netplot_mcovs, include = c("ExpectedInfluence"), scale = 'z-scores',
+                       labels = nameslongcovs)
+dev.off()
+
+
+# females -----------------------------------------------------------------
+
+
+
+net_fcovs <- estimateNetwork(dat_fcovs, default = "EBICglasso",
+                         missing = "pairwise",
+                         signed = T)
+
+
+
+
+netplot_fcovs <- plot(net_fcovs, layout = "circle", vsize = 5, 
+                  border.color="black",
+                  nodeNames = nameslongcovs,
+                  filetype = "pdf", filename = "netplot_fcovs",
+                  plot = T)
+
+
+pdf('ei_fcovs.pdf', width = 4.15, height = 5)
+ei_fcovs <- centralityPlot(netplot_fcovs, include = c("ExpectedInfluence"), scale = 'z-scores',
+                       labels = nameslongcovs)
+dev.off()
+
+
+
+
+
+# bootstrap ---------------------------------------------------------------
 
 
 
 
 
 
+# NCT ---------------------------------------------------------------------
 
 
 
+nct1covs <- NCT(net_mcovs, net_fcovs, it = 500, weighted = T,
+            test.edges = T, edges = "all",
+            test.centrality = T,
+            centrality = c("expectedInfluence"), nodes = "all",
+            
+            progressbar = T,
+            verbose = T)
+
+save(nct1covs, file = "nct1covs.RData")
 
 
 
-
+summary(nct1covs)
 
 
 
