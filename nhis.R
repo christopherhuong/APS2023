@@ -275,6 +275,8 @@ dat$gad_sum <- dat$gad1 + dat$gad2 + dat$gad3 + dat$gad4 +
 
 
 # split sample M F --------------------------------------------------------
+library(tidyverse)
+
 
 #save(dat, file = 'nhis19_clean.rdata')
 load('nhis19_clean.rdata')
@@ -335,7 +337,11 @@ library(qgraph)
 library(mgm)         
 library(bootnet)         
 library(networktools) 
+library(NetworkComparisonTest)
 
+
+
+# male --------------------------------------------------------------------
 
 
 net_m1 <- estimateNetwork(dat_m1, default = "EBICglasso",
@@ -346,21 +352,29 @@ net_m1 <- estimateNetwork(dat_m1, default = "EBICglasso",
 
 #save(net1, file='net1.rdata')
 
-netplot_m1 <- plot(net_m1, layout = "spring", vsize = 5.5, 
+netplot_m1 <- plot(net_m1, layout = "circle", vsize = 5.5, 
                  border.color="black",
                  nodeNames = nameslong,
                  legend.mode = "names",
                  label.cex = 1.2,
                  legend.cex = .85,
                  layoutOffset = c(0,0),
-                 GLratio = 2.7,
-                 width = 17, height = 9,
+                 GLratio = 2.0,
+                 width = 12, height = 9,
                  filetype = "pdf", filename = "netplot_m1",
                  plot = T)
 
 
 
 
+pdf('ei_m1.pdf', width = 4, height = 5)
+ei_m1 <- centralityPlot(netplot_m1, include = c("ExpectedInfluence"), scale = 'z-scores',
+                           labels = nameslong)
+dev.off()
+
+
+
+# female ------------------------------------------------------------------
 
 
 net_f1 <- estimateNetwork(dat_f1, default = "EBICglasso",
@@ -369,11 +383,40 @@ net_f1 <- estimateNetwork(dat_f1, default = "EBICglasso",
 
 
 
+#save(net1, file='net1.rdata')
+
+netplot_f1 <- plot(net_f1, layout = "circle", vsize = 5.5, 
+                   border.color="black",
+                   nodeNames = nameslong,
+                   legend.mode = "names",
+                   label.cex = 1.2,
+                   legend.cex = .85,
+                   layoutOffset = c(0,0),
+                   GLratio = 2.0,
+                   width = 12, height = 9,
+                   filetype = "pdf", filename = "netplot_f1",
+                   plot = T)
+
+
+
+
+pdf('ei_f1.pdf', width = 4.2, height = 5)
+ei_f1 <- centralityPlot(netplot_f1, include = c("ExpectedInfluence"), scale = 'z-scores',
+                        labels = nameslong)
+dev.off()
 
 
 
 
 
+
+nct1 <- NCT(net_m1, net_f1, it = 500, weighted = T,
+            test.edges = T, edges = "all",
+            test.centrality = T,
+            centrality = c("expectedInfluence"), nodes = "all",
+            
+            progressbar = T,
+            verbose = T)
 
 
 
