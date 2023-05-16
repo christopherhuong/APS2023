@@ -313,11 +313,11 @@ dat_f2 <- dat_f %>%
 ## phq + gad + covariates
 dat_m3 <- dat_m %>%
   select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
-         sex, age, edu, race, bmi, pain_freq, genhlth, depr_med)
+         age, edu, race, bmi, pain_freq, genhlth, depr_med)
 
 dat_f3 <- dat_f %>%
   select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
-         sex, age, edu, race, bmi, pain_freq, genhlth, depr_med)
+         age, edu, race, bmi, pain_freq, genhlth, depr_med)
 
 
 
@@ -331,7 +331,7 @@ nameslong <- c("How often little interest in things",
                "How often moving or speaking slow or fast")
 
 
-# estimate networks -------------------------------------------------------
+# estimate PHQ networks -------------------------------------------------------
 
 library(qgraph)       
 library(mgm)         
@@ -423,6 +423,119 @@ nct1 <- NCT(net_m1, net_f1, it = 500, weighted = T,
 
 
 
+# PHQ + covariates --------------------------------------------------------
+#####################
+######################
+#########################
+############################
+############
+
+## phq + gad + covariates
+dat_m3 <- dat_m %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         age, edu, race, bmi, pain_freq, genhlth, depr_med)
+
+dat_f3 <- dat_f %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         age, edu, race, bmi, pain_freq, genhlth, depr_med)
+
+
+
+nameslong3 <- c("How often little interest in things",
+               "How often feeling down",
+               "How often trouble with sleeping",
+               "How often feeling tired",
+               "How often undereating or overeating",
+               "How often feeling bad about self",
+               "How often trouble concentrating",
+               "How often moving or speaking slow or fast",
+               "Age", "Edu", "Race", "BMI",
+               "Pain Frequency", "General Health",
+               "Take medication for depression")
+
+
+
+# male --------------------------------------------------------------------
+
+
+net_m3 <- estimateNetwork(dat_m3, default = "EBICglasso",
+                          missing = "pairwise",
+                          signed = T)
+
+
+
+
+
+netplot_m3 <- plot(net_m3, layout = "circle", vsize = 5.5, 
+                   border.color="black",
+                   nodeNames = nameslong3,
+                   legend.mode = "names",
+                   label.cex = 1.2,
+                   legend.cex = .85,
+                   layoutOffset = c(0,0),
+                   GLratio = 2.0,
+                   width = 12, height = 9,
+                   filetype = "pdf", filename = "netplot_m3",
+                   plot = T)
+
+
+
+
+pdf('ei_m3.pdf', width = 4, height = 5)
+ei_m3 <- centralityPlot(netplot_m3, include = c("ExpectedInfluence"), scale = 'z-scores',
+                        labels = nameslong3)
+dev.off()
+
+
+
+# female ------------------------------------------------------------------
+
+
+net_f3 <- estimateNetwork(dat_f3, default = "EBICglasso",
+                          missing = "pairwise",
+                          signed = T)
+
+
+
+
+
+netplot_f3 <- plot(net_f3, layout = "circle", vsize = 5.5, 
+                   border.color="black",
+                   nodeNames = nameslong3,
+                   legend.mode = "names",
+                   label.cex = 1.2,
+                   legend.cex = .85,
+                   layoutOffset = c(0,0),
+                   GLratio = 2.0,
+                   width = 12, height = 9,
+                   filetype = "pdf", filename = "netplot_f3",
+                   plot = T)
+
+
+
+
+pdf('ei_f3.pdf', width = 4.2, height = 5)
+ei_f3 <- centralityPlot(netplot_f3, include = c("ExpectedInfluence"), scale = 'z-scores',
+                        labels = nameslong3)
+dev.off()
+
+
+
+
+
+
+nct3 <- NCT(net_m3, net_f3, it = 500, weighted = T,
+            test.edges = T, edges = "all",
+            test.centrality = T,
+            centrality = c("expectedInfluence"), nodes = "all",
+            
+            progressbar = T,
+            verbose = T)
+
+summary(nct3)
+
+
+plot(nct3, what = "network")
 
 
 
@@ -431,11 +544,7 @@ nct1 <- NCT(net_m1, net_f1, it = 500, weighted = T,
 
 
 
-
-
-
-
-
+# network tree ------------------------------------------------------------
 
 
 
