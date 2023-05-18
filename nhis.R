@@ -1,3 +1,5 @@
+
+
 library(rio)
 library(tidyverse)
 
@@ -545,6 +547,120 @@ plot(nct3, what = "network")
 
 
 # network tree ------------------------------------------------------------
+library(networktree)
+
+
+
+dat1 <- dat %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         sex, age, edu, bmi, pain_freq, genhlth, depr_med)
+
+
+f <- paste(paste0(colnames(select(dat1, -c(sex))),
+                  collapse = " + "), "~ sex")
+
+f  <- as.formula(f)
+f
+
+tr1 <- networktree(f, data = dat1, model = "correlation", maxdepth = 3,
+                  transform = "glasso")
+
+
+save(tr1, file = "tr1.RData")
+
+
+print(tr1, digits = 2)
+
+
+
+## Add a comparison plot
+comparetree(tr1, id1=2, id2=3, plot=TRUE,
+            highlights=10,
+            detect="glasso",
+            layout="circle"
+            )
+
+# $highlights
+# node1     node2         id1         id2 (id1 - id2)
+# 1    age       edu -0.04640757  0.04298341 -0.08939098
+# 2    age      phq4 -0.08804541 -0.02522512 -0.06282029
+# 3   phq2      phq6  0.30228351  0.36256175 -0.06027825
+# 4    age pain_freq  0.20312983  0.14904300  0.05408683
+# 5    bmi       edu -0.06974628 -0.01689640 -0.05284988
+# 6    age   genhlth -0.18184515 -0.23453221  0.05268705
+# 7   phq7      phq8  0.25097030  0.30039354 -0.04942324
+# 8    bmi  depr_med  0.06384389  0.01508117  0.04876272
+# 9   phq6      phq7  0.15671979  0.11016163  0.04655816
+# 10   bmi   genhlth -0.14904626 -0.10995419 -0.03909207
+
+
+# phq, gad, covs ----------------------------------------------------------
+
+
+dat2 <- dat %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         gad1, gad2, gad3, gad4, gad5, gad6, gad7,
+         sex, age, edu, bmi, pain_freq, genhlth, depr_med)
+
+
+
+f <- paste(paste0(colnames(select(dat2, -c(sex))),
+                  collapse = " + "), "~ sex")
+
+f  <- as.formula(f)
+f
+
+tr2 <- networktree(f, data = dat2, model = "correlation", maxdepth = 3,
+                   transform = "glasso")
+
+
+save(tr1, file = "tr1.RData")
+
+
+print(tr2, digits = 2)
+
+
+
+## Add a comparison plot
+comparetree(tr2, id1=2, id2=3, plot=TRUE,
+            highlights=10,
+            layout="circle"
+)
+
+
+
+# $highlights
+# node1    node2         id1         id2 (id1 - id2)
+# 1    age      edu -0.04530132  0.04298692 -0.08828824
+# 2   gad2     gad3  0.49524201  0.41294378  0.08229823
+# 3    age  genhlth -0.17985040 -0.23507181  0.05522141
+# 4    age     gad6 -0.11450520 -0.06053078 -0.05397442
+# 5    bmi      edu -0.06700364 -0.01570665 -0.05129700
+# 6    age     phq4 -0.05017215  0.00000000 -0.05017215
+# 7   phq7     phq8  0.19924970  0.24913959 -0.04988990
+# 8    bmi depr_med  0.06528518  0.01607549  0.04920969
+# 9   gad5     gad6  0.07253333  0.12130924 -0.04877591
+# 10  phq6     phq7  0.10322112  0.05580763  0.04741348
+# 
+# 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

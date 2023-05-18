@@ -136,7 +136,7 @@ dat <- phqfun(dat, 'PHQ9')
 
 
 #save(dat, file = 'nhanes_clean.rdata')
-load('nhanes_clean.rdata')
+load('nhanes_m_f/nhanes_clean.rdata')
 
 # missingness -------------------------------------------------------------
 
@@ -182,7 +182,7 @@ library(mgm)
 library(bootnet)         
 library(networktools) 
 library(NetworkComparisonTest)
-
+library(networktree)
 
 
 # goldbricker for redundant nodes -----------------------------------------
@@ -406,10 +406,35 @@ summary(nct1covs)
 
 
 
+# network trees -----------------------------------------------------------
 
 
 
 
+
+
+
+
+f <- paste(paste0(colnames(select(dat, -c(BMI))),
+                  collapse = " + "), "~ BMI")
+
+f  <- as.formula(f)
+f
+
+tr1 <- networktree(f, data = dat, model = "correlation", maxdepth = 3,
+                   transform = "glasso")
+
+
+
+print(tr1, digits = 2)
+
+
+
+## Add a comparison plot
+comparetree(tr2, id1=2, id2=3, plot=TRUE,
+            highlights=10,
+            layout="circle"
+)
 
 
 
