@@ -182,7 +182,7 @@ library(mgm)
 library(bootnet)         
 library(networktools) 
 library(NetworkComparisonTest)
-
+library(networktree)
 
 
 # goldbricker for redundant nodes -----------------------------------------
@@ -406,6 +406,7 @@ summary(nct1covs)
 
 
 
+<<<<<<< HEAD
 
 
 
@@ -443,6 +444,9 @@ comparetree(tr_0, id1=2, id2=3, plot=TRUE,
             highlights = 10,
             layout="circle",
             plot.type="compare")
+=======
+# network trees -----------------------------------------------------------
+>>>>>>> a7875ae5088a540b7b8add58d9196a3bb0bd8a54
 
 
 
@@ -450,14 +454,39 @@ comparetree(tr_0, id1=2, id2=3, plot=TRUE,
 
 
 
+<<<<<<< HEAD
 library(networktree)
 
 # networktree with phq + covariates ---------------------------------------
+=======
+
+f <- paste(paste0(colnames(select(dat, -c(BMI))),
+                  collapse = " + "), "~ BMI")
+
+f  <- as.formula(f)
+f
+
+tr1 <- networktree(f, data = dat, model = "correlation", maxdepth = 3,
+                   transform = "glasso")
+
+
+
+print(tr1, digits = 2)
+
+
+
+## Add a comparison plot
+comparetree(tr2, id1=2, id2=3, plot=TRUE,
+            highlights=10,
+            layout="circle"
+)
+>>>>>>> a7875ae5088a540b7b8add58d9196a3bb0bd8a54
 
 
 
 
 
+<<<<<<< HEAD
 
 
 f <- paste(paste0(colnames(select(dat, -c(SEX))),
@@ -481,6 +510,8 @@ comparetree(tr_0, id1=2, id2=3, plot=TRUE,
             highlights = 10,
             layout="circle",
             plot.type="compare")
+=======
+>>>>>>> a7875ae5088a540b7b8add58d9196a3bb0bd8a54
 
 
 
