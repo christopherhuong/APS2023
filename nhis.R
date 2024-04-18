@@ -310,7 +310,7 @@ dat_f2 <- dat_f %>%
          gad1, gad2, gad3, gad4, gad5, gad6, gad7)
 
 
-## phq + gad + covariates
+## phq  + covariates
 dat_m3 <- dat_m %>%
   select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
          age, edu, race, bmi, pain_freq, genhlth, depr_med)
@@ -545,6 +545,116 @@ plot(nct3, what = "network")
 
 
 # network tree ------------------------------------------------------------
+library(networktree)
+
+
+
+
+
+dat_0 <- dat %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         sex)
+
+
+
+f <- paste(paste0(colnames(select(dat_0, -c(sex))),
+                  collapse = " + "), "~ sex")
+
+f <- as.formula(f)
+
+
+tr_0 <- networktree(f, data = dat_0, model = "correlation",
+                    transform = "glasso",
+                    maxdepth = 2)
+
+
+save(tr_0, file = "tree_0.RData")
+
+
+print(tr_0, digits = 2)
+
+
+comparetree(tr_0, id1=2, id2=3, plot=TRUE,
+            highlights = 15,
+            layout="circle",
+            plot.type="compare")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# network tree with phq + covariates --------------------------------------
+
+
+
+dat_1 <- dat %>%
+  select(phq1, phq2, phq3, phq4, phq5, phq6, phq7, phq8,
+         sex, age, edu, race, bmi, pn_fq, genhlth, d_med)
+
+
+
+f <- paste(paste0(colnames(select(dat_1, -c(sex))),
+                  collapse = " + "), "~ sex")
+
+f <- as.formula(f)
+
+
+tr_1 <- networktree(f, data = dat_1, model = "correlation",
+                    transform = "glasso",
+                    maxdepth = 2)
+
+
+save(tr_1, file = "tree_1.RData")
+
+
+print(tr_1, digits = 2)
+
+
+comparetree(tr_1, id1=2, id2=3, plot=TRUE,
+            highlights = 15,
+            layout="circle",
+            plot.type="compare")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

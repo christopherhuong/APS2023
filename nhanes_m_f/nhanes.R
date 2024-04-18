@@ -4,10 +4,10 @@ library(tidyverse)
 
 
 
-dat1 <- import('nhanes_dpq.XPT')
-dat2 <- import('nhanes_demo.XPT')
-dat3 <- import('nhanes_pa.XPT')
-dat4 <- import('nhanes_bmi.XPT')
+dat1 <- import('nhanes_m_f/nhanes_dpq.XPT')
+dat2 <- import('nhanes_m_f/nhanes_demo.XPT')
+dat3 <- import('nhanes_m_f/nhanes_pa.XPT')
+dat4 <- import('nhanes_m_f/nhanes_bmi.XPT')
 
 
 dat <- inner_join(dat1, dat2, by = "SEQN")
@@ -136,7 +136,7 @@ dat <- phqfun(dat, 'PHQ9')
 
 
 #save(dat, file = 'nhanes_clean.rdata')
-load('nhanes_clean.rdata')
+load('nhanes_m_f/nhanes_clean.rdata')
 
 # missingness -------------------------------------------------------------
 
@@ -409,12 +409,78 @@ summary(nct1covs)
 
 
 
+# network tree, PHQ only --------------------------------------------------
+
+library(networktree)
+
+
+
+dat_0 <- dat %>%
+  select(PHQ1, PHQ2, PHQ3, PHQ4, PHQ5, PHQ6,
+         PHQ7, PHQ8, PHQ9,
+         SEX)
+
+
+
+f <- paste(paste0(colnames(select(dat_0, -c(SEX))),
+                  collapse = " + "), "~ SEX")
+
+f <- as.formula(f)
+
+
+tr_0 <- networktree(f, data = dat_0, model = "correlation",
+                    transform = "glasso",
+                    maxdepth = 3)
+
+
+#save(tr_0, file = "tree_0.RData")
+
+
+print(tr_0, digits = 2)
+
+
+comparetree(tr_0, id1=2, id2=3, plot=TRUE,
+            highlights = 10,
+            layout="circle",
+            plot.type="compare")
 
 
 
 
 
 
+
+library(networktree)
+
+# networktree with phq + covariates ---------------------------------------
+
+
+
+
+
+
+
+f <- paste(paste0(colnames(select(dat, -c(SEX))),
+                  collapse = " + "), "~ SEX")
+
+f <- as.formula(f)
+
+
+tr_1 <- networktree(f, data = dat, model = "correlation",
+                    transform = "glasso",
+                    maxdepth = 2)
+
+
+#save(tr_0, file = "tree_0.RData")
+
+
+print(tr_1, digits = 2)
+
+
+comparetree(tr_0, id1=2, id2=3, plot=TRUE,
+            highlights = 10,
+            layout="circle",
+            plot.type="compare")
 
 
 
