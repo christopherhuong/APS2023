@@ -14,17 +14,18 @@ rm(dpq, paq)
 
 
 d <- d %>%
-  select(PAQ650, PAQ665,
+  select(PAQ650, PAQ665, PAD680,
          # PAD615, PAD630, PAD645, PAD660, PAD675,
          DPQ010, DPQ020, DPQ030, DPQ040,  DPQ050,
          DPQ060, DPQ070, DPQ080, DPQ090
   )
 
 
-names(d) <- c("VIG_LEIS", "MOD_LEIS",
+names(d) <- c("VIG_LEIS", "MOD_LEIS", "SED",
               # "VIG_WORK", "MOD_WORK", "WALK", "VIG_LEIS", "MOD_LEIS",
                "PHQ1", "PHQ2", "PHQ3", "PHQ4", "PHQ5",
-               "PHQ6", "PHQ7", "PHQ8", "PHQ9")
+               "PHQ6", "PHQ7", "PHQ8", "PHQ9"
+              )
 
 # recode NAs
 for(i in 1:2){
@@ -34,7 +35,7 @@ for(i in 1:2){
 }
 
 
-for(i in 3:11){
+for(i in 4:12){
   d <- d %>% mutate(!!colnames(d)[i] := case_when(.data[[colnames(d)[i]]] == 0 ~ 0, # not at all
                                                   .data[[colnames(d)[i]]] == 1 ~ 1, # several days
                                                   .data[[colnames(d)[i]]] == 2 ~ 2, # more than half of days,
@@ -45,22 +46,24 @@ for(i in 3:11){
 }
 
 
-# create leisure PA variable
-# PA = 1 if yes to vigorous and/or moderate recreational activities in typical week
-# PA == 2 if not
-d$PA <- ifelse(d$VIG_LEIS == 1 | d$MOD_LEIS == 1, 1, 2)
+
+# Replace values with NA
+d[which(d$SED==7777), "SED"] <- NA
+d[which(d$SED==9999), "SED"] <- NA
+
+d$SED <- ifelse(d$SED < median(d$SED, na.rm=T), 1, 2)
 
 mgm_d <- list(
   data = na.omit(d[, -c(1,2)]),
-  type = c(rep("g", 9), "c"),
-  level = c(rep(1, 9), 2)
+  type = c("c", rep("g", 9)),
+  level = c(2, rep(1, 9))
 )
 
 
 mnm <- mgm(data=mgm_d$data,
            type=mgm_d$type,
            level = mgm_d$level,
-           moderators=10,
+           moderators=1,
            lambdaSel = "EBIC",
            lambdaGam = 0.25,
            ruleReg = "AND")
@@ -105,10 +108,15 @@ nct1
 summary(nct1)
 
 
-d_lm <- d
-d_lm$PHQ_tot <- rowSums(d_lm[, 3:11])
-lm(PHQ_tot ~ PA, data=d_lm) |>
 
+# create leisure PA variable
+# PA = 1 if yes to vigorous and/or moderate recreational activities in typical week
+# PA == 2 if not
+d$PA <- ifelse(d$VIG_LEIS == 1 | d$MOD_LEIS == 1, 1, 2)
+d_lm <- d
+d_lm$PHQ_tot <- rowSums(d_lm[, 4:12])
+
+t.test(d_lm$PHQ_tot[d_lm$PA==1], d_lm$PHQ_tot[d_lm$PA==2])
 
 
 
